@@ -6,10 +6,10 @@ interface NotesHttpResponse {
     totalPages: number;
 }
 
-interface NewNote {
+interface CreateNote {
     title: string;
     content: string;
-    tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping';
+    tag: string;
 }
 
 const URL = 'https://notehub-public.goit.study/api/notes';
@@ -32,7 +32,7 @@ export const fetchNotes = async (query: string, page: number): Promise<NotesHttp
     return response.data;
 };
 
-export const createNote = async (newNote: NewNote): Promise<Note> => {
+export const createNote = async (newNote: CreateNote): Promise<Note> => {
     const response = await axios.post<Note>(URL, newNote, {
         headers
     });

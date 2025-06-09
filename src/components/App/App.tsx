@@ -18,7 +18,7 @@ export default function App() {
   const [page, setPage] = useState<number>(1);
   const [isCreateNote, setIsCreateNote] =useState<boolean>(false);
 
-  const updateQuery = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const updateQuery = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setQuery(event.target.value);
     setPage(1);
   };
@@ -31,14 +31,14 @@ export default function App() {
     placeholderData: keepPreviousData,
   });
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!isLoading && data && data.notes.length === 0) {
-      toast('📭 Нотаток не знайдено за цим запитом');
+      toast('📭 No notes found for this query');
     }
   }, [isLoading, data]);
 
-  const handleClick = () => setIsCreateNote(true);
-  const handleClose = () => setIsCreateNote(false);
+  const handleClick = (): void => setIsCreateNote(true);
+  const handleClose = (): void => setIsCreateNote(false);
 
   return (
     <div className={css.app}>

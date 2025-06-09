@@ -1,10 +1,11 @@
 import css from './NoteForm.module.css'
 import { ErrorMessage, Field, Formik, Form, type FormikHelpers } from 'formik';
 import * as Yup from 'yup';
-import { useId } from 'react';
+import { useCallback } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { createNote } from '../../services/noteService';
 import toast from 'react-hot-toast';
+
 
 interface NoteFormValues {
   title: string;
@@ -29,38 +30,33 @@ export default function NoteForm({onClose}: NoteFormProps) {
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
-      toast.success('📝 Нотатку створено успішно'); 
-      onClose();
     },
-  })
+  });
 
-    const handleSubmit = (
-      values: NoteFormValues,
-      action: FormikHelpers<NoteFormValues>
-    ) => { 
+  const handleSubmit = useCallback(
+    (values: NoteFormValues, action: FormikHelpers<NoteFormValues>) => {
       mutation.mutate(values, {
         onSuccess: () => {
           action.resetForm();
-          onClose()
+          toast.success('📝 Note created successfully');
+          onClose();
         },
       });
-    }
+    },
+    [mutation, onClose]
+  );
 
-    const title = useId();
-    const content = useId();
-    const tag = useId();
-
-    const Schema = Yup.object().shape({
-      title: Yup.string()
-      .min(3, 'Title must be at least 3 characters')
-      .max(50, 'Title is too long')
-      .required('Title is required'),
-      content: Yup.string()
-      .max(500, 'Content is too long'),
-      tag: Yup.string()
-      .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'], 'Invalid category')
-      .required('Tag is required'),
-    });
+  const Schema = Yup.object().shape({
+    title: Yup.string()
+     .min(3, 'Title must be at least 3 characters')
+     .max(50, 'Title is too long')
+     .required('Title is required'),
+    content: Yup.string()
+     .max(500, 'Content is too long'),
+    tag: Yup.string()
+     .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'], 'Invalid category')
+     .required('Tag is required'),
+  });
 
   return (
     <Formik 
@@ -69,9 +65,9 @@ export default function NoteForm({onClose}: NoteFormProps) {
       onSubmit={handleSubmit}>
       <Form className={css.form}>
        <div className={css.formGroup}>
-        <label htmlFor={title}>Title</label>
+        <label htmlFor='note-title'>Title</label>
           <Field
-            id={title}
+            id='note-title'
             type='text'
             name='title'
             className={css.input}
@@ -84,10 +80,10 @@ export default function NoteForm({onClose}: NoteFormProps) {
        </div>
 
        <div className={css.formGroup}>
-         <label htmlFor={content}>Content</label>
+         <label htmlFor='note-content'>Content</label>
           <Field
            as='textarea'
-           id={content}
+           id='note-content'
            name='content'
            rows={8}
            className={css.textarea}
@@ -100,10 +96,10 @@ export default function NoteForm({onClose}: NoteFormProps) {
        </div>
 
        <div className={css.formGroup}>
-        <label htmlFor={tag}>Tag</label>
+        <label htmlFor='note-tag'>Tag</label>
           <Field
             as='select'
-            id={tag}
+            id='note-tag'
             name='tag'
             className={css.select}>
             <option value='Todo'>Todo</option>
